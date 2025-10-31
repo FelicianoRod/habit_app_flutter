@@ -1,0 +1,106 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:8277559469672140008",
+      "lastPropertyId": "14:2340576318155093400",
+      "name": "HabitEntity",
+      "properties": [
+        {
+          "id": "1:8259134062068990707",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6273806563025371401",
+          "name": "habitId",
+          "type": 9
+        },
+        {
+          "id": "3:602968145928933391",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:8749130872974233300",
+          "name": "measureType",
+          "type": 9
+        },
+        {
+          "id": "5:4575227963511126212",
+          "name": "measureAmount",
+          "type": 6
+        },
+        {
+          "id": "6:5426996704367716109",
+          "name": "measureDescription",
+          "type": 9
+        },
+        {
+          "id": "7:8922404341493588185",
+          "name": "measureTimeInMinutes",
+          "type": 6
+        },
+        {
+          "id": "8:5063879269821670159",
+          "name": "measureRepetitionsCount",
+          "type": 6
+        },
+        {
+          "id": "9:7712698515501611139",
+          "name": "icon",
+          "type": 9
+        },
+        {
+          "id": "10:1235743817356870237",
+          "name": "iconColor",
+          "type": 9
+        },
+        {
+          "id": "11:7258864788484630674",
+          "name": "iconBackground",
+          "type": 9
+        },
+        {
+          "id": "12:3628490823299390692",
+          "name": "reminderTimestamp",
+          "type": 6
+        },
+        {
+          "id": "13:6409431907359169471",
+          "name": "reminderVibrate",
+          "type": 1
+        },
+        {
+          "id": "14:2340576318155093400",
+          "name": "reminderSound",
+          "type": 1
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:6218435188947418762",
+  "lastIndexId": "1:1312269993216131232",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    6218435188947418762
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    1290215926709979481,
+    938897737165323226,
+    2422719365508688050,
+    8975223381343888019,
+    3732623046559763645,
+    3215958582535090281
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
