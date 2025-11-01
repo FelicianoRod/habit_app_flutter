@@ -73,8 +73,8 @@ class CustomIconState extends _$CustomIconState {
   CustomIcon build() {
     return CustomIcon(
       icon: Icons.directions_bike.codePoint.toString(),
-      iconColor: "0xFF8ABEB9",
-      backgroundColor: "0xFF305669",
+      iconColor: "8ABEB9",
+      backgroundColor: "305669",
     );
   }
 

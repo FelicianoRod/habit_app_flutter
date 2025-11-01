@@ -45,6 +45,14 @@ class _CreateHabitScreenState extends ConsumerState<HabitFormScreen> {
   // Duration
   Duration _duration = Duration(hours: 0, minutes: 30);
 
+  Color hexToColor(String hex) {
+    // Si viene sin el prefijo #
+    hex = hex.replaceAll('#', '');
+    // Añadimos FF si no incluye canal alfa
+    if (hex.length == 6) hex = 'FF$hex';
+    return Color(int.parse(hex, radix: 16));
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -81,18 +89,14 @@ class _CreateHabitScreenState extends ConsumerState<HabitFormScreen> {
         title: const Text('Color del icono'),
         content: SingleChildScrollView(
           child: BlockPicker(
-            pickerColor: Color(int.parse(picked.iconColor)),
+            pickerColor: hexToColor(picked.iconColor),
             onColorChanged: (c) {
               _iconColor = c;
-              // ref
-              //     .read(customIconStateProvider.notifier)
-              //     .setIconColor(c.toHexString());
             },
           ),
         ),
         actions: [
           TextButton(
-            // onPressed: () => Navigator.of(context).pop(),
             onPressed: () {
               context.pop();
             },
@@ -121,7 +125,7 @@ class _CreateHabitScreenState extends ConsumerState<HabitFormScreen> {
         title: const Text('Color del fondo'),
         content: SingleChildScrollView(
           child: BlockPicker(
-            pickerColor: Color(int.parse(picked.backgroundColor)),
+            pickerColor: hexToColor(picked.backgroundColor),
             onColorChanged: (c) {
               _bgColor = c;
             },
