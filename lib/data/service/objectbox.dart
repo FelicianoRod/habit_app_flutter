@@ -7,10 +7,11 @@ part 'objectbox.g.dart';
 
 class ObjectBox {
   static ObjectBox? _instance;
-  // late final Admin admin;
+  late final Admin? admin;
 
   ObjectBox._(this.store) {
     // admin = Admin(store);
+    _startAdminIfDebug();
     _initialData();
   }
   final Store store;
@@ -31,6 +32,18 @@ class ObjectBox {
     return _instance!;
   }
 
+  void _startAdminIfDebug() {
+    // if (!kReleaseMode) {
+    try {
+      admin = Admin(store);
+      // admin!.start();
+      print("🚀 ObjectBox Admin corriendo en http://127.0.0.1:8081");
+    } catch (e) {
+      print("⚠️ Error iniciando Admin: $e");
+    }
+    // }
+  }
+
   void close() => store.close();
 
   void _initialData() {
@@ -41,7 +54,7 @@ class ObjectBox {
       final initialHabits = [
         HabitEntity(
           id: 0,
-          habitId: DateTime.now().microsecondsSinceEpoch.toString(),
+          // habitId: DateTime.now().microsecondsSinceEpoch.toString(),
           name: 'Beber agua',
           measureType: 'quantity',
           measureAmount: 8,
@@ -53,7 +66,7 @@ class ObjectBox {
         ),
         HabitEntity(
           id: 0,
-          habitId: (DateTime.now().microsecondsSinceEpoch + 1).toString(),
+          // habitId: (DateTime.now().microsecondsSinceEpoch + 1).toString(),
           name: 'Correr',
           measureType: 'time',
           measureTimeInMinutes: 20,
@@ -66,7 +79,7 @@ class ObjectBox {
         ),
         HabitEntity(
           id: 0,
-          habitId: (DateTime.now().microsecondsSinceEpoch + 2).toString(),
+          // habitId: (DateTime.now().microsecondsSinceEpoch + 2).toString(),
           name: 'Hacer flexiones',
           measureType: 'repetitions',
           measureRepetitionsCount: 15,

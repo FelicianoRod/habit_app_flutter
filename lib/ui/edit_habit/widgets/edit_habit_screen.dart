@@ -2,25 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habits_app/core/enum/measure.dart';
-import 'package:habits_app/core/providers/create_habit_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:habits_app/domain/models/habit.dart';
+import 'package:habits_app/ui/edit_habit/viewmodel/edit_habit_viewmodel.dart';
 
 import '../../../theme/app_constants.dart';
 
-class EditHabitScreen extends ConsumerStatefulWidget {
-  const EditHabitScreen({super.key});
+class EditHabitScreen extends ConsumerWidget {
+  final int habitId;
+
+  const EditHabitScreen({super.key, required this.habitId});
 
   @override
-  ConsumerState<EditHabitScreen> createState() => _CreateHabitScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitAsync = ref.watch(getHabitByIdProvider(habitId));
+
+    return habitAsync.when(
+      data: (habit) => _EditHabitForm(initialHabit: habit!),
+      // TODO
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
 }
 
-class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
+class _EditHabitForm extends ConsumerStatefulWidget {
+  final Habit initialHabit;
+  const _EditHabitForm({super.key, required this.initialHabit});
+
+  @override
+  ConsumerState<_EditHabitForm> createState() => _CreateHabitScreenState();
+}
+
+class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
+  late final TextEditingController nameController;
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
 
   // Measure state
+  String _measureType = "Quantity";
   // final Measure? _selectedMeasure = null;
-  String _measureType = 'Quantity'; // 'Quantity' | 'Time' | 'Repetitions'
+  // late MeasureEnum _measureType;
   final _amountController = TextEditingController();
   final _minutesController = TextEditingController();
   final _repetitionsController = TextEditingController();
@@ -39,6 +62,65 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
   DateTime _combineTimeOfDay(TimeOfDay time) {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  }
+
+  String measureToString(Measure measure) {
+    String stringMeasure = 'Quantity';
+    measure.when(
+      quantity: (_, __) {
+        stringMeasure = 'Quantity';
+      },
+      time: (_) {
+        stringMeasure = 'Time';
+      },
+      repetitions: (_, __) {
+        stringMeasure = 'Repetitions';
+      },
+    );
+    return stringMeasure;
+  }
+
+  Color hexToColor(String hex) {
+    // Si viene sin el prefijo #
+    hex = hex.replaceAll('#', '');
+    // Añadimos FF si no incluye canal alfa
+    if (hex.length == 6) hex = 'FF$hex';
+    return Color(int.parse(hex, radix: 16));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.initialHabit.name);
+    _measureType = measureToString(widget.initialHabit.measure);
+
+    widget.initialHabit.measure.when(
+      quantity: (amount, description) {
+        _amountController.text = amount.toString();
+        _measureDescController.text = description ?? '';
+      },
+      time: (timeInMinutes) {
+        _minutesController.text = timeInMinutes.toString();
+      },
+      repetitions: (count, description) {
+        _repetitionsController.text = count.toString();
+        _measureDescController.text = description ?? '';
+      },
+    );
+
+    _selectedIcon = IconData(
+      int.parse(widget.initialHabit.icon.icon),
+      fontFamily: 'materialIcons',
+    );
+    _iconColor = hexToColor(widget.initialHabit.icon.iconColor);
+    _bgColor = hexToColor(widget.initialHabit.icon.backgroundColor);
+
+    _reminderEnabled = widget.initialHabit.reminder != null ? true : false;
+    if (_reminderEnabled) {
+      final reminder = widget.initialHabit.reminder!.time;
+
+      _reminderTime = TimeOfDay(hour: reminder.hour, minute: reminder.minute);
+    }
   }
 
   @override
@@ -130,42 +212,44 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
     // ...hook into your Bloc/Provider/Repository...
 
     // Aquí
-    // final createHabit = ref
-    //     .read(createHabitProvider.notifier)
-    //     .createHabit(
-    //       name: _nameController.text,
-    //       measure: _measureType == 'Quantity'
-    //           ? Measure.quantity(
-    //               amount: int.parse(_amountController.text),
-    //               description: _measureDescController.text.isNotEmpty
-    //                   ? _measureDescController.text
-    //                   : null,
-    //             )
-    //           : _measureType == 'Time'
-    //           ? Measure.time(timeInMinutes: int.parse(_minutesController.text))
-    //           : Measure.repetitions(
-    //               count: int.parse(_repetitionsController.text),
-    //               description: _measureDescController.text.isNotEmpty
-    //                   ? _measureDescController.text
-    //                   : null,
-    //             ),
-    //       reminder: _reminderEnabled
-    //           ? Reminder(time: _combineTimeOfDay(_reminderTime))
-    //           : null,
-    //       icon: CustomIcon(
-    //         icon: _selectedIcon != null
-    //             ? '0x${_selectedIcon!.codePoint.toRadixString(16)}'
-    //             : '0xe3af', // default icon code
-    //         iconColor: _iconColor.value.toRadixString(16).toUpperCase(),
-    //         backgroundColor: _bgColor.value.toRadixString(16).toUpperCase(),
-    //       ),
-    //     );
+    final updateHabit = ref
+        .read(updateHabitProvider.notifier)
+        .updateHabit(
+          id: widget.initialHabit.id,
+          name: nameController.text,
+          measure: _measureType == 'Quantity'
+              ? Measure.quantity(
+                  amount: int.parse(_amountController.text),
+                  description: _measureDescController.text.isNotEmpty
+                      ? _measureDescController.text
+                      : null,
+                )
+              : _measureType == 'Time'
+              ? Measure.time(timeInMinutes: int.parse(_minutesController.text))
+              : Measure.repetitions(
+                  count: int.parse(_repetitionsController.text),
+                  description: _measureDescController.text.isNotEmpty
+                      ? _measureDescController.text
+                      : null,
+                ),
+          reminder: _reminderEnabled
+              ? Reminder(time: _combineTimeOfDay(_reminderTime))
+              : null,
+          icon: CustomIcon(
+            icon: _selectedIcon != null
+                ? '0x${_selectedIcon!.codePoint.toRadixString(16)}'
+                : '0xe3af', // default icon code
+            iconColor: _iconColor.value.toRadixString(16).toUpperCase(),
+            backgroundColor: _bgColor.value.toRadixString(16).toUpperCase(),
+          ),
+        );
+    // final createHabit = ref.read(createHabitProvider.notifier).createHabit();
 
-    // // debugPrint('Saving habit: $payload');
-    // ScaffoldMessenger.of(
-    //   context,
-    // ).showSnackBar(const SnackBar(content: Text('Habit saved (demo)')));
-    // context.pop();
+    // debugPrint('Saving habit: $payload');
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Hábito guardado')));
+    context.pop();
   }
 
   Widget _sectionHeader(String title) {
@@ -202,10 +286,15 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedMeasure = ref.watch(selectedMeasureProvider);
+    // final habit = ref.watch(getHabitByIdProvider(widget.habitId));
+    // final selectedMeasure = ref.watch(selectedMeasureProvider);
+    // final habit = ref.watch(editHabitProvider(widget.initialHabit));
+    // final notifier = ref.read(editHabitProvider(widget.initialHabit).notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear hábito'), elevation: 0),
+      appBar: AppBar(title: const Text('Editar hábito'), elevation: 0),
+      // body: habit.when(
+      //   data: (habit) {
       body: Form(
         key: _formKey,
         child: CustomScrollView(
@@ -217,52 +306,54 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _nameController,
+                      controller: nameController,
+                      // onChanged: (value) => notifier.updateName,
                       decoration: InputDecoration(
-                        labelText: 'Nombre',
-                        hintText: 'P. ej. Beber agua',
-                        prefixIcon: Icon(
-                          Icons.run_circle_outlined,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        labelText: 'Título',
+                        hintText: 'Ej: Beber agua',
+                        // prefixIcon: Icon(
+                        //   Icons.run_circle_outlined,
+                        //   color: Theme.of(context).colorScheme.primary,
+                        // ),
                       ),
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                     ),
                     const SizedBox(height: AppConstants.spacingM),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: DropdownButtonFormField<String>(
-                    //         // value: _measureType,
-                    //         hint: const Text('Selecciona la medida'),
-                    //         items: const [
-                    //           DropdownMenuItem(
-                    //             value: 'Quantity',
-                    //             child: Text('Cantidad'),
-                    //           ),
-                    //           DropdownMenuItem(
-                    //             value: 'Time',
-                    //             child: Text('Tiempo'),
-                    //           ),
-                    //           DropdownMenuItem(
-                    //             value: 'Repetitions',
-                    //             child: Text('Repeticiones'),
-                    //           ),
-                    //         ],
-                    //         onChanged: (v) {
-                    //           if (v == null) return;
-                    //           setState(() {
-                    //             _measureType = v;
-                    //           });
-                    //         },
-                    //         decoration: const InputDecoration(
-                    //           labelText: 'Medida',
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            // value: _measureType,
+                            hint: const Text('Selecciona la medida'),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Quantity',
+                                child: Text('Cantidad'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Time',
+                                child: Text('Tiempo'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Repetitions',
+                                child: Text('Repeticiones'),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v == null) return;
+                              setState(() {
+                                _measureType = v;
+                              });
+                            },
+                            initialValue: _measureType,
+                            decoration: const InputDecoration(
+                              labelText: 'Medida',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -274,79 +365,81 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
               child: _card(
                 child: Column(
                   children: [
-                    if (selectedMeasure == MeasureEnum.quantity) ...[
-                      TextFormField(
-                        controller: _amountController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Cantidad',
-                          hintText: 'Ej: 8',
+                    ...widget.initialHabit.measure.when(
+                      quantity: (amount, description) => [
+                        TextFormField(
+                          controller: _amountController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Cantidad',
+                            hintText: 'Ej: 8',
+                          ),
+                          validator: (v) {
+                            if (_measureType != 'Quantity') return null;
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Requerido';
+                            }
+                            if (int.tryParse(v) == null)
+                              return 'Introduce un número';
+                            return null;
+                          },
                         ),
-                        validator: (v) {
-                          if (_measureType != 'Quantity') return null;
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Requerido';
-                          }
-                          if (int.tryParse(v) == null)
-                            return 'Introduce un número';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: AppConstants.spacingS),
-                      TextFormField(
-                        controller: _measureDescController,
-                        decoration: const InputDecoration(
-                          labelText: 'Descripción (opcional)',
-                          hintText: 'Ej: Litros',
+                        const SizedBox(height: AppConstants.spacingS),
+                        TextFormField(
+                          controller: _measureDescController,
+                          decoration: const InputDecoration(
+                            labelText: 'Descripción (opcional)',
+                            hintText: 'Ej: Litros',
+                          ),
                         ),
-                      ),
-                    ],
-                    if (selectedMeasure == MeasureEnum.time) ...[
-                      TextFormField(
-                        controller: _minutesController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Minutos',
-                          hintText: 'Ej: 30',
+                      ],
+                      time: (timeInMinutes) => [
+                        TextFormField(
+                          controller: _minutesController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Minutos',
+                            hintText: 'Ej: 30',
+                          ),
+                          validator: (v) {
+                            if (_measureType != 'Time') return null;
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Requerido';
+                            }
+                            if (int.tryParse(v) == null)
+                              return 'Ingresa un número';
+                            return null;
+                          },
                         ),
-                        validator: (v) {
-                          if (_measureType != 'Time') return null;
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Requerido';
-                          }
-                          if (int.tryParse(v) == null)
-                            return 'Ingresa un número';
-                          return null;
-                        },
-                      ),
-                    ],
-                    if (selectedMeasure == MeasureEnum.repetitions) ...[
-                      TextFormField(
-                        controller: _repetitionsController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Repeticiones',
-                          hintText: 'Ej: 2',
+                      ],
+                      repetitions: (count, description) => [
+                        TextFormField(
+                          controller: _repetitionsController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Repeticiones',
+                            hintText: 'Ej: 2',
+                          ),
+                          validator: (v) {
+                            if (_measureType != 'Repetitions') return null;
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Requerido';
+                            }
+                            if (int.tryParse(v) == null)
+                              return 'Ingresa un número';
+                            return null;
+                          },
                         ),
-                        validator: (v) {
-                          if (_measureType != 'Repetitions') return null;
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Requerido';
-                          }
-                          if (int.tryParse(v) == null)
-                            return 'Ingresa un número';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: AppConstants.spacingS),
-                      TextFormField(
-                        controller: _measureDescController,
-                        decoration: const InputDecoration(
-                          labelText: 'Descripción (opcional)',
-                          hintText: 'Ej: Veces al día',
+                        const SizedBox(height: AppConstants.spacingS),
+                        TextFormField(
+                          controller: _measureDescController,
+                          decoration: const InputDecoration(
+                            labelText: 'Descripción (opcional)',
+                            hintText: 'Ej: Veces al día',
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -432,10 +525,20 @@ class _CreateHabitScreenState extends ConsumerState<EditHabitScreen> {
           ],
         ),
       ),
+
+      //   },
+      //   loading:() => const CircularProgressIndicator(),
+      //   error:(error, stackTrace) {
+      //     Text('Error');
+      //   },
+      // ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(AppConstants.spacingM),
         child: ElevatedButton(
           onPressed: _save,
+          // onPressed: () {
+          //   notifier.saveChanges;
+          // },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(

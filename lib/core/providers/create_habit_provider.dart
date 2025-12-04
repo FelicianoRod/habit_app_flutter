@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:habits_app/core/enum/measure.dart';
-import 'package:habits_app/data/repositories/habit_repository_imp.dart';
 import 'package:habits_app/domain/models/habit.dart';
 import 'package:habits_app/domain/repositories/habit_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -165,8 +164,8 @@ class CreateHabit extends _$CreateHabit {
       final reminder = ref.watch(setReminderProvider);
       final icon = ref.watch(customIconStateProvider);
 
-      final habit = HabitCreationPayload(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      final habit = Habit(
+        // id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: name,
         measure: measure,
         reminder: reminder,

@@ -43,17 +43,17 @@ class HabitRepositoryImp implements HabitRepository {
   }
 
   @override
-  Future<void> create(HabitCreationPayload payload) async {
+  Future<void> create(Habit habit) async {
     // si el payload no tiene id, generar uno simple
-    final id = payload.id ?? DateTime.now().microsecondsSinceEpoch.toString();
-    final domain = Habit(
-      id: id,
-      name: payload.name,
-      measure: payload.measure,
-      reminder: payload.reminder,
-      icon: payload.icon,
-    );
-    final entity = HabitEntity.fromDomain(domain);
+    // final id = payload.id ?? DateTime.now().microsecondsSinceEpoch.toString();
+    // final domain = Habit(
+    //   id: id,
+    //   name: payload.name,
+    //   measure: payload.measure,
+    //   reminder: payload.reminder,
+    //   icon: payload.icon,
+    // );
+    final entity = HabitEntity.fromDomain(habit);
     _box.put(entity);
   }
 
@@ -64,8 +64,8 @@ class HabitRepositoryImp implements HabitRepository {
   }
 
   @override
-  Future<Habit?> getById(String id) async {
-    final q = _box.query(HabitEntity_.habitId.equals(id)).build();
+  Future<Habit?> getById(int id) async {
+    final q = _box.query(HabitEntity_.id.equals(id)).build();
     final res = q.find();
     q.close();
     if (res.isEmpty) return null;
@@ -73,26 +73,28 @@ class HabitRepositoryImp implements HabitRepository {
   }
 
   @override
-  Future<void> update(Habit payload) async {
+  Future<void> update(Habit habit) async {
     // buscar entidad por habitId
-    final q = _box.query(HabitEntity_.habitId.equals(payload.id)).build();
+    final q = _box.query(HabitEntity_.id.equals(habit.id)).build();
     final found = q.find();
     q.close();
+    // print(found.first);
+    print(habit.id);
     if (found.isEmpty) {
       // crear si no existe
-      final e = HabitEntity.fromDomain(payload);
+      final e = HabitEntity.fromDomain(habit);
       _box.put(e);
       return;
     }
     final entity = found.first;
     // actualizar campos
-    final updated = HabitEntity.fromDomain(payload)..id = entity.id;
+    final updated = HabitEntity.fromDomain(habit)..id = entity.id;
     _box.put(updated);
   }
 
   @override
-  Future<void> delete(String id) async {
-    final q = _box.query(HabitEntity_.habitId.equals(id)).build();
+  Future<void> delete(int id) async {
+    final q = _box.query(HabitEntity_.id.equals(id)).build();
     final found = q.find();
     q.close();
     if (found.isEmpty) return;

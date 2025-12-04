@@ -5,7 +5,7 @@ part 'habit.freezed.dart';
 @freezed
 abstract class Habit with _$Habit {
   const factory Habit({
-    required String id,
+    @Default(0) int id,
     required String name,
     required Measure measure,
     Reminder? reminder,

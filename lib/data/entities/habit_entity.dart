@@ -5,7 +5,7 @@ import 'package:objectbox/objectbox.dart';
 class HabitEntity {
   HabitEntity({
     this.id = 0,
-    required this.habitId,
+    // required this.habitId,
     required this.name,
     required this.measureType,
     this.measureAmount,
@@ -24,7 +24,7 @@ class HabitEntity {
   int id; // objectbox native id
 
   // domain id (string)
-  String habitId;
+  // String habitId;
 
   String name;
 
@@ -72,7 +72,7 @@ class HabitEntity {
     );
 
     return HabitEntity(
-      habitId: h.id,
+      // habitId: h.id,
       name: h.name,
       measureType: type,
       measureAmount: amount,
@@ -123,7 +123,7 @@ class HabitEntity {
         : null;
 
     return Habit(
-      id: habitId,
+      id: id,
       name: name,
       measure: measure,
       reminder: reminder,

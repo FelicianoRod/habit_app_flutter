@@ -307,7 +307,7 @@ final class CustomIconStateProvider
   }
 }
 
-String _$customIconStateHash() => r'd2b20d747e08aa755499453833c9dfad4fe27b31';
+String _$customIconStateHash() => r'2ee490d49f5daaadc9f30d7c147612553bbc377f';
 
 abstract class _$CustomIconState extends $Notifier<CustomIcon> {
   CustomIcon build();
@@ -417,7 +417,7 @@ final class CreateHabitProvider
   }
 }
 
-String _$createHabitHash() => r'2f554ebdcb966bdb6f2d7efe8d6d5abda42d1133';
+String _$createHabitHash() => r'e99e622cf925b68fdaf27122444a65dbacdbb7b4';
 
 /// ViewModel encargado de crear hábitos
 

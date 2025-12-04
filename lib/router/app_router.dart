@@ -9,6 +9,10 @@ import 'package:habits_app/ui/stats/widgets/stats_tab.dart';
 
 import '../ui/main/main_screen.dart';
 
+// class RouteNames {
+//   static const editHabit = 'edit-habit';
+// }
+
 final goRouter = GoRouter(
   initialLocation: '/',
   routes: [
@@ -45,9 +49,13 @@ final goRouter = GoRouter(
               ],
             ),
             GoRoute(
-              path: '/edit-habit',
-              pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: EditHabitScreen()),
+              // name: RouteNames.editHabit,
+              path: '/edit-habit/:habitId',
+              builder: (context, state) {
+                final habitId = state.pathParameters["habitId"]!;
+                final id = int.parse(habitId);
+                return EditHabitScreen(habitId: id);
+              },
             ),
           ],
         ),

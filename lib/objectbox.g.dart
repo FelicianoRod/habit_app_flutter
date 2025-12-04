@@ -32,12 +32,6 @@ final _entities = <obx_int.ModelEntity>[
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 6273806563025371401),
-        name: 'habitId',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(3, 602968145928933391),
         name: 'name',
         type: 9,
@@ -166,6 +160,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       8975223381343888019,
       3732623046559763645,
       3215958582535090281,
+      6273806563025371401,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -183,7 +178,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (HabitEntity object, fb.Builder fbb) {
-        final habitIdOffset = fbb.writeString(object.habitId);
         final nameOffset = fbb.writeString(object.name);
         final measureTypeOffset = fbb.writeString(object.measureType);
         final measureDescriptionOffset = object.measureDescription == null
@@ -194,7 +188,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final iconBackgroundOffset = fbb.writeString(object.iconBackground);
         fbb.startTable(15);
         fbb.addInt64(0, object.id);
-        fbb.addOffset(1, habitIdOffset);
         fbb.addOffset(2, nameOffset);
         fbb.addOffset(3, measureTypeOffset);
         fbb.addInt64(4, object.measureAmount);
@@ -219,9 +212,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final habitIdParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 8, '');
@@ -268,7 +258,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         );
         final object = HabitEntity(
           id: idParam,
-          habitId: habitIdParam,
           name: nameParam,
           measureType: measureTypeParam,
           measureAmount: measureAmountParam,
@@ -298,68 +287,63 @@ class HabitEntity_ {
     _entities[0].properties[0],
   );
 
-  /// See [HabitEntity.habitId].
-  static final habitId = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[1],
-  );
-
   /// See [HabitEntity.name].
   static final name = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[2],
+    _entities[0].properties[1],
   );
 
   /// See [HabitEntity.measureType].
   static final measureType = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[3],
+    _entities[0].properties[2],
   );
 
   /// See [HabitEntity.measureAmount].
   static final measureAmount = obx.QueryIntegerProperty<HabitEntity>(
-    _entities[0].properties[4],
+    _entities[0].properties[3],
   );
 
   /// See [HabitEntity.measureDescription].
   static final measureDescription = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[5],
+    _entities[0].properties[4],
   );
 
   /// See [HabitEntity.measureTimeInMinutes].
   static final measureTimeInMinutes = obx.QueryIntegerProperty<HabitEntity>(
-    _entities[0].properties[6],
+    _entities[0].properties[5],
   );
 
   /// See [HabitEntity.measureRepetitionsCount].
   static final measureRepetitionsCount = obx.QueryIntegerProperty<HabitEntity>(
-    _entities[0].properties[7],
+    _entities[0].properties[6],
   );
 
   /// See [HabitEntity.icon].
   static final icon = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[8],
+    _entities[0].properties[7],
   );
 
   /// See [HabitEntity.iconColor].
   static final iconColor = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[9],
+    _entities[0].properties[8],
   );
 
   /// See [HabitEntity.iconBackground].
   static final iconBackground = obx.QueryStringProperty<HabitEntity>(
-    _entities[0].properties[10],
+    _entities[0].properties[9],
   );
 
   /// See [HabitEntity.reminderTimestamp].
   static final reminderTimestamp = obx.QueryIntegerProperty<HabitEntity>(
-    _entities[0].properties[11],
+    _entities[0].properties[10],
   );
 
   /// See [HabitEntity.reminderVibrate].
   static final reminderVibrate = obx.QueryBooleanProperty<HabitEntity>(
-    _entities[0].properties[12],
+    _entities[0].properties[11],
   );
 
   /// See [HabitEntity.reminderSound].
   static final reminderSound = obx.QueryBooleanProperty<HabitEntity>(
-    _entities[0].properties[13],
+    _entities[0].properties[12],
   );
 }

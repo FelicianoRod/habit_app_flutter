@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Habit {
 
- String get id; String get name; Measure get measure; Reminder? get reminder; CustomIcon get icon;
+ int get id; String get name; Measure get measure; Reminder? get reminder; CustomIcon get icon;
 /// Create a copy of Habit
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $HabitCopyWith<$Res>  {
   factory $HabitCopyWith(Habit value, $Res Function(Habit) _then) = _$HabitCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, Measure measure, Reminder? reminder, CustomIcon icon
+ int id, String name, Measure measure, Reminder? reminder, CustomIcon icon
 });
 
 
@@ -65,7 +65,7 @@ class _$HabitCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? measure = null,Object? reminder = freezed,Object? icon = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,measure: null == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
 as Measure,reminder: freezed == reminder ? _self.reminder : reminder // ignore: cast_nullable_to_non_nullable
 as Reminder?,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
@@ -184,7 +184,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Habit() when $default != null:
 return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);case _:
@@ -205,7 +205,7 @@ return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)  $default,) {final _that = this;
 switch (_that) {
 case _Habit():
 return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);case _:
@@ -225,7 +225,7 @@ return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  Measure measure,  Reminder? reminder,  CustomIcon icon)?  $default,) {final _that = this;
 switch (_that) {
 case _Habit() when $default != null:
 return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);case _:
@@ -240,10 +240,10 @@ return $default(_that.id,_that.name,_that.measure,_that.reminder,_that.icon);cas
 
 
 class _Habit implements Habit {
-  const _Habit({required this.id, required this.name, required this.measure, this.reminder, required this.icon});
+  const _Habit({this.id = 0, required this.name, required this.measure, this.reminder, required this.icon});
   
 
-@override final  String id;
+@override@JsonKey() final  int id;
 @override final  String name;
 @override final  Measure measure;
 @override final  Reminder? reminder;
@@ -279,7 +279,7 @@ abstract mixin class _$HabitCopyWith<$Res> implements $HabitCopyWith<$Res> {
   factory _$HabitCopyWith(_Habit value, $Res Function(_Habit) _then) = __$HabitCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, Measure measure, Reminder? reminder, CustomIcon icon
+ int id, String name, Measure measure, Reminder? reminder, CustomIcon icon
 });
 
 
@@ -299,7 +299,7 @@ class __$HabitCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? measure = null,Object? reminder = freezed,Object? icon = null,}) {
   return _then(_Habit(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,measure: null == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
 as Measure,reminder: freezed == reminder ? _self.reminder : reminder // ignore: cast_nullable_to_non_nullable
 as Reminder?,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable

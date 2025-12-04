@@ -17,7 +17,7 @@ final class DeleteHabitProvider
     with $FutureModifier<void>, $FutureProvider<void> {
   const DeleteHabitProvider._({
     required DeleteHabitFamily super.from,
-    required String super.argument,
+    required int super.argument,
   }) : super(
          retry: null,
          name: r'deleteHabitProvider',
@@ -43,7 +43,7 @@ final class DeleteHabitProvider
 
   @override
   FutureOr<void> create(Ref ref) {
-    final argument = this.argument as String;
+    final argument = this.argument as int;
     return deleteHabit(ref, argument);
   }
 
@@ -58,10 +58,10 @@ final class DeleteHabitProvider
   }
 }
 
-String _$deleteHabitHash() => r'5c1b2954bac2e5ba3e0d5563ce71252195d878e4';
+String _$deleteHabitHash() => r'42e9d01dfff6d15e7a9bff34f5c9bf6c72a24c14';
 
 final class DeleteHabitFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<void>, String> {
+    with $FunctionalFamilyOverride<FutureOr<void>, int> {
   const DeleteHabitFamily._()
     : super(
         retry: null,
@@ -71,7 +71,7 @@ final class DeleteHabitFamily extends $Family
         isAutoDispose: true,
       );
 
-  DeleteHabitProvider call(String id) =>
+  DeleteHabitProvider call(int id) =>
       DeleteHabitProvider._(argument: id, from: this);
 
   @override

@@ -7,11 +7,11 @@ part 'habit_repository.g.dart';
 
 abstract class HabitRepository {
   Stream<List<Habit>> watchAll();
-  Future<void> create(HabitCreationPayload payload);
+  Future<void> create(Habit habit);
   Future<List<Habit>> getAll();
-  Future<Habit?> getById(String id);
-  Future<void> update(Habit payload);
-  Future<void> delete(String id);
+  Future<Habit?> getById(int id);
+  Future<void> update(Habit habit);
+  Future<void> delete(int id);
 }
 
 /// Provider que expone una implementación concreta (ObjectBox)
@@ -19,7 +19,6 @@ abstract class HabitRepository {
 Future<HabitRepository> habitRepository(Ref ref) async {
   final ob = await ref.watch(objectBoxProvider.future);
   return Future.value(HabitRepositoryImp(ob.store));
-  // return HabitRepositoryImp(ob.store);
 }
 
 // Helper types to avoid depending on domain file within interface file

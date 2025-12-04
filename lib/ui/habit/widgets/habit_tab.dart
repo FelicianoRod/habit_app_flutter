@@ -23,7 +23,7 @@ class _HabitTabState extends ConsumerState<HabitTab> {
   final periods = ['All Day', 'Morning', 'Evening', 'Afternoon'];
 
   // estado local para controlar qué item está expandido
-  String? _expandedId;
+  int? _expandedId;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class _HabitTabState extends ConsumerState<HabitTab> {
           // context.push('/create-habit');
           context.push('/habits/measure');
         },
-        tooltip: 'Crear Hábito',
+        tooltip: 'Editar Hábito',
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -313,7 +313,8 @@ class _HabitTabState extends ConsumerState<HabitTab> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => context.push('/edit-habit/${habit.id}'),
+                    onPressed: () =>
+                        context.push('/habits/edit-habit/${habit.id}'),
                     tooltip: 'Editar',
                   ),
                   IconButton(
