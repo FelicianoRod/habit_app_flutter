@@ -3,6 +3,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habits_app/core/enum/measure.dart';
+import 'package:habits_app/core/utils/hex_to_color.dart';
 import 'package:habits_app/domain/models/habit.dart';
 import 'package:habits_app/ui/edit_habit/viewmodel/edit_habit_viewmodel.dart';
 
@@ -19,7 +21,6 @@ class EditHabitScreen extends ConsumerWidget {
 
     return habitAsync.when(
       data: (habit) => _EditHabitForm(initialHabit: habit!),
-      // TODO
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
@@ -35,28 +36,23 @@ class _EditHabitForm extends ConsumerStatefulWidget {
 }
 
 class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
-  late final TextEditingController nameController;
-
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
 
-  // Measure state
-  String _measureType = "Quantity";
-  // final Measure? _selectedMeasure = null;
-  // late MeasureEnum _measureType;
+  final _nameController = TextEditingController();
   final _amountController = TextEditingController();
   final _minutesController = TextEditingController();
   final _repetitionsController = TextEditingController();
   final _measureDescController = TextEditingController();
 
-  // Appearance
+  String _measureType = "Quantity";
+
+  // Icon appearance
   IconData? _selectedIcon;
   Color _iconColor = Colors.blue;
   Color _bgColor = Colors.grey.shade800;
 
   // Reminder
   bool _reminderEnabled = false;
-  // TimeOfDay _reminderTime = TimeOfDay.now();
   TimeOfDay _reminderTime = TimeOfDay.now();
 
   DateTime _combineTimeOfDay(TimeOfDay time) {
@@ -80,18 +76,10 @@ class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
     return stringMeasure;
   }
 
-  Color hexToColor(String hex) {
-    // Si viene sin el prefijo #
-    hex = hex.replaceAll('#', '');
-    // Añadimos FF si no incluye canal alfa
-    if (hex.length == 6) hex = 'FF$hex';
-    return Color(int.parse(hex, radix: 16));
-  }
-
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.initialHabit.name);
+    _nameController.text = widget.initialHabit.name;
     _measureType = measureToString(widget.initialHabit.measure);
 
     widget.initialHabit.measure.when(
@@ -135,7 +123,6 @@ class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
 
   Future<void> _pickIcon() async {
     // flutter_iconpicker: shows a picker and returns IconData?
-    // final IconData? icon = await FlutterIconPicker.showIconPicker(
     final IconPickerIcon? icon = await showIconPicker(
       context,
       // optional: limit packs if you want
@@ -216,7 +203,7 @@ class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
         .read(updateHabitProvider.notifier)
         .updateHabit(
           id: widget.initialHabit.id,
-          name: nameController.text,
+          name: _nameController.text,
           measure: _measureType == 'Quantity'
               ? Measure.quantity(
                   amount: int.parse(_amountController.text),
@@ -306,7 +293,7 @@ class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: nameController,
+                      controller: _nameController,
                       // onChanged: (value) => notifier.updateName,
                       decoration: InputDecoration(
                         labelText: 'Título',
@@ -365,81 +352,99 @@ class _CreateHabitScreenState extends ConsumerState<_EditHabitForm> {
               child: _card(
                 child: Column(
                   children: [
-                    ...widget.initialHabit.measure.when(
-                      quantity: (amount, description) => [
-                        TextFormField(
-                          controller: _amountController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Cantidad',
-                            hintText: 'Ej: 8',
+                    switch (measureTextToEnum(_measureType)) {
+                      MeasureEnum.quantity => Column(
+                        children: [
+                          TextFormField(
+                            controller: _amountController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Cantidad',
+                              hintText: 'Ej: 8',
+                            ),
+                            validator: (value) {
+                              if (measureTextToEnum(_measureType) !=
+                                  MeasureEnum.quantity) {
+                                return null;
+                              }
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Requerido';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Introduce un número';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (v) {
-                            if (_measureType != 'Quantity') return null;
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Requerido';
-                            }
-                            if (int.tryParse(v) == null)
-                              return 'Introduce un número';
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppConstants.spacingS),
-                        TextFormField(
-                          controller: _measureDescController,
-                          decoration: const InputDecoration(
-                            labelText: 'Descripción (opcional)',
-                            hintText: 'Ej: Litros',
+                          const SizedBox(height: AppConstants.spacingS),
+                          TextFormField(
+                            controller: _measureDescController,
+                            decoration: const InputDecoration(
+                              labelText: 'Descripción (opcional)',
+                              hintText: 'Ej: Litros',
+                            ),
                           ),
-                        ),
-                      ],
-                      time: (timeInMinutes) => [
-                        TextFormField(
-                          controller: _minutesController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Minutos',
-                            hintText: 'Ej: 30',
+                        ],
+                      ),
+                      MeasureEnum.time => Column(
+                        children: [
+                          TextFormField(
+                            controller: _minutesController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Minutos',
+                              hintText: 'Ej: 30',
+                            ),
+                            validator: (value) {
+                              if (measureTextToEnum(_measureType) !=
+                                  MeasureEnum.time) {
+                                return null;
+                              }
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Requerido';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Ingresa un número';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (v) {
-                            if (_measureType != 'Time') return null;
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Requerido';
-                            }
-                            if (int.tryParse(v) == null)
-                              return 'Ingresa un número';
-                            return null;
-                          },
-                        ),
-                      ],
-                      repetitions: (count, description) => [
-                        TextFormField(
-                          controller: _repetitionsController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Repeticiones',
-                            hintText: 'Ej: 2',
+                        ],
+                      ),
+                      MeasureEnum.repetitions => Column(
+                        children: [
+                          TextFormField(
+                            controller: _repetitionsController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Repeticiones',
+                              hintText: 'Ej: 2',
+                            ),
+                            validator: (v) {
+                              if (measureTextToEnum(_measureType) !=
+                                  MeasureEnum.repetitions) {
+                                return null;
+                              }
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Requerido';
+                              }
+                              if (int.tryParse(v) == null) {
+                                return 'Ingresa un número';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (v) {
-                            if (_measureType != 'Repetitions') return null;
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Requerido';
-                            }
-                            if (int.tryParse(v) == null)
-                              return 'Ingresa un número';
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppConstants.spacingS),
-                        TextFormField(
-                          controller: _measureDescController,
-                          decoration: const InputDecoration(
-                            labelText: 'Descripción (opcional)',
-                            hintText: 'Ej: Veces al día',
+                          const SizedBox(height: AppConstants.spacingS),
+                          TextFormField(
+                            controller: _measureDescController,
+                            decoration: const InputDecoration(
+                              labelText: 'Descripción (opcional)',
+                              hintText: 'Ej: Veces al día',
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    },
                   ],
                 ),
               ),

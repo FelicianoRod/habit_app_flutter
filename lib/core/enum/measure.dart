@@ -11,3 +11,16 @@ extension MeasureX on Measure {
     );
   }
 }
+
+MeasureEnum measureTextToEnum(String measure) {
+  switch (measure) {
+    case 'Quantity':
+      return MeasureEnum.quantity;
+    case 'Time':
+      return MeasureEnum.time;
+    case 'Repetitions':
+      return MeasureEnum.repetitions;
+    default:
+      return MeasureEnum.quantity;
+  }
+}
