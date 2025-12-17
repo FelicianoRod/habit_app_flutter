@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.4"
+  chronograph:
+    dependency: "direct main"
+    description:
+      name: chronograph
+      sha256: "652f1552985f2a33f4b6a09dd8b66545594ef583b95feb68dbae0d80ba1caf9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   chunked_stream:
     dependency: transitive
     description:

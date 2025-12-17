@@ -23,6 +23,7 @@ dependencies:
   objectbox: ^5.0.0
   objectbox_flutter_libs: any
   duration_picker: ^1.2.0
+  chronograph: ^1.0.2
 
 dev_dependencies:
   flutter_test:
